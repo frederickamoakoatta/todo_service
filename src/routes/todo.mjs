@@ -1,23 +1,27 @@
 import {Router} from "express";
 import {prefix} from "../utils/constants.mjs";
-const router = Router();
+const todoRouter = Router();
 
-router.use(prefix, router);
+todoRouter.use(prefix, todoRouter);
 
-router.get("/todos", async (req, res) => {
+todoRouter.get("/todos", async (req, res) => {
     res.status(200).send({todos: 'works'});
 });
 
-router.post("/todos", async (req, res) => {
+todoRouter.get("/todos/:id", async (req, res) => {
 
 });
 
-router.patch("/todo:id", async (req, res) => {
+todoRouter.post("/todos", async (req, res) => {
 
 });
 
-router.delete("/todo:id", async (req, res) => {
+todoRouter.patch("/todos:id", async (req, res) => {
 
 });
 
-export default router;
+todoRouter.delete("/todos:id", async (req, res) => {
+
+});
+
+export default todoRouter;

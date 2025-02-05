@@ -1,5 +1,9 @@
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
-const prefix = process.env.PREFIX || "/api/v1/";
+const prefix = process.env.API_PREFIX;
 
-export {port, prefix}
+const usersTable = process.env.DB_USERS_TABLE;
+
+const todoTable = process.env.DB_TODO_TABLE;
+
+export {port, prefix, usersTable, todoTable}
