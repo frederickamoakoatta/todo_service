@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
     "express": "^4.21.2",
     "nodemod": "^3.0.6"
   },
