@@ -1,5 +1,6 @@
-import {db} from "./config.mjs";
-import {usersTable} from "../utils/constants.mjs";
+import {awsDB} from "./config.mjs";
+
+const usersTable = 'todo-users';
 
 const params = {
     TableName: usersTable,
@@ -8,9 +9,9 @@ const params = {
         ":user_id": "1"
     }
 }
+
 const testDB = async () => {
-    const data = await db.query(params).promise();
+    const data = await awsDB.query(params).promise();
     console.log(data.Items)
 }
 
-export default testDB;
