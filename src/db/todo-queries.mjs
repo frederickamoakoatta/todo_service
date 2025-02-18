@@ -1,4 +1,4 @@
-import {deleteData, fetchData, insertData, updateData} from "./config.mjs";
+import {deleteData, fetchData, insertData, updateData} from "./core.mjs";
 
 const todoTable = 'todo-items';
 
@@ -13,7 +13,6 @@ const getTodos = async (userId) => {
     }
     return fetchData(params);
 }
-
 
 const getTodo = async (userId, taskId) => {
     const params = {
@@ -61,7 +60,6 @@ const updateTodo = async (task) => {
     }
     return updateData(params);
 }
-
 
 const deleteTodo = async (task) => {
     const params = {

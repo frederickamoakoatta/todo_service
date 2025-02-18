@@ -6,8 +6,9 @@ The Todo Service is a RESTful API built with Express.js, AWS OAuth, AWS Amplify,
 Additionally, the service powers an admin frontend where users can obtain API keys to access the endpoints.
 
 ## Features
-- User authentication via AWS OAuth
+- User authentication via AWS Cognito
 - API key management via AWS Amplify
+- Request logging and observability with AWS CloudWatch
 - Secure parameter storage using AWS Parameter Store
 - Scalable NoSQL storage with DynamoDB
 - Fully tested API endpoints using Jest

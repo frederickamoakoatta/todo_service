@@ -1,12 +1,13 @@
 import express from 'express';
-import appRouter from "./routes/index.mjs";
-import {fetchParam} from "./db/config.mjs";
+import {fetchParam} from "./db/core.mjs";
+import {authValidator} from "./utils/middlewares.mjs";
+import todoRouter from "./routes/todo.mjs";
 
 
 const app = express();
-
 app.use(express.json());
-app.use(appRouter);
+app.use(authValidator);
+app.use(todoRouter);
 
 
 const startServer = async () => {
