@@ -4,7 +4,6 @@ import {errorHandler, idValidator, statusValidator, taskValidator} from "../util
 
 const todoRouter = Router();
 
-// todoRouter.use('/api/v1/', todoRouter);
 
 todoRouter.get("/todos", async (req, res) => {
     try {

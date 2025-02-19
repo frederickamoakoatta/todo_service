@@ -1,5 +1,6 @@
 import {deleteData, fetchData, insertData, updateData} from "./core.mjs";
 import {getMockTodo, getMockTodos} from "../utils/mocks.mjs";
+import {generateId} from "../utils/util.mjs";
 
 const todoTable = 'todo-items';
 const isLocalEnvironment = process.env.IS_LOCAL === 'true' || process.env.SAM_LOCAL;
@@ -47,7 +48,7 @@ const insertTodo = async (task) => {
     const params = {
         TableName: todoTable,
         Item: {
-            task_id: task.taskId,
+            task_id: generateId(),
             user_id: task.userId,
             is_completed: task.completed,
             tasks: task.tasks,

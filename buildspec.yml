@@ -1,0 +1,29 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - npm install -g aws-sam-cli
+      - npm install
+  pre_build:
+    commands:
+      - echo "Starting build process..."
+      - npm prune --production
+  build:
+    commands:
+      - echo "Building SAM application..."
+      - sam build --debug
+  post_build:
+    commands:
+      - echo "Deploying application..."
+      - sam deploy --stack-name todo-app --no-confirm-changeset --no-fail-on-empty-changeset --parameter-overrides "Stage=prod Environment=cloud" --capabilities CAPABILITY_IAM
+artifacts:
+  files:
+    - template.yaml
+    - samconfig.toml
+    - .aws-sam/**/*
+    - package.json
+    - package-lock.json
+    - src/**/*
+  discard-paths: no
