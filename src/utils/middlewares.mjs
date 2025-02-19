@@ -1,7 +1,21 @@
-import {header, body, param, validationResult} from "express-validator"
+import {header, body, param, validationResult} from "express-validator";
+import jwt from "jsonwebtoken";
+import jwksClient from "jwks-rsa";
+import {logEvent} from "./util.mjs";
 
-const logger = (req, res) => {
-    //TODO : Build a cloudwatch utility function, register on all routes for req and error res
+const REGION = 'us-west-1';
+const USER_POOL_ID = 'us-west-1_ZEPalthpD';
+const ISSUER = `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`;
+const JWKS_URI = `${ISSUER}/.well-known/jwks.json`;
+
+const client = jwksClient({
+    jwksUri: JWKS_URI,
+});
+
+const logger = async (req, res, next) => {
+    const message = `User ID ${req.headers.userid} made a ${req.method.toUpperCase()} request ${['POST', 'PATCH'].some((item) => item.toUpperCase() === req.method.toUpperCase()) ? `with req body of ${JSON.stringify(req.body)}` :``}`;
+    await logEvent(message);
+    next();
 }
 
 const errorHandler = (req, res, next) => {
@@ -35,4 +49,33 @@ const idValidator = param('id')
         .exists().withMessage('task id is required in path parameter');
 
 
-export {errorHandler, authValidator, taskValidator, statusValidator, idValidator};
+const getKey = (header, callback) => {
+    client.getSigningKey(header.kid, (err, key) => {
+        if (err) {
+            return callback(err);
+        }
+        const signingKey = key?.getPublicKey();
+        callback(null, signingKey);
+    });
+}
+
+const verifyToken = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "Unauthorized: No token provided" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    jwt.verify(token, getKey, { issuer: ISSUER }, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ error: "Unauthorized: Invalid token" });
+        }
+        req.user = decoded;
+        next();
+    });
+};
+
+
+export {errorHandler, authValidator, taskValidator, statusValidator, idValidator, verifyToken, logger};
