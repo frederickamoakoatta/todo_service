@@ -14,14 +14,18 @@ Parameters:
 
 Globals:
   Function:
-    Timeout: 30
-    MemorySize: 256
+    Timeout: 900
+    MemorySize: 1024
     Runtime: nodejs20.x
     Environment:
       Variables:
         NODE_ENV: !Ref Stage
         STAGE: !Ref Stage
         PORT: 8080
+        IS_LOCAL: !If [IsDevStage, 'true', 'false']
+
+Conditions:
+  IsDevStage: !Equals [!Ref Stage, 'dev']
 
 Resources:
   TodoServiceFunction:
@@ -33,19 +37,21 @@ Resources:
         - x86_64
       Policies:
         - AWSLambdaBasicExecutionRole
-        - Statement:
-            - Effect: Allow
-              Action:
-                - 'ssm:GetParameter'
-                - 'ssm:GetParameters'
-              Resource:
-                - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/todo-service/${Stage}/*'
+        - AmazonDynamoDBFullAccess
+        - AmazonSSMReadOnlyAccess
+        - CloudWatchFullAccess
       Events:
-        HttpApiEvent:
+        RootPath:
           Type: HttpApi
           Properties:
             ApiId: !Ref TodoServiceApi
-            Path: "/{proxy+}"
+            Path: /
+            Method: ANY
+        ProxyPath:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref TodoServiceApi
+            Path: /{proxy+}
             Method: ANY
 
   TodoServiceApi:
@@ -56,11 +62,7 @@ Resources:
         AllowOrigins:
           - '*'
         AllowHeaders:
-          - Content-Type
-          - Authorization
-          - X-Amz-Date
-          - X-Api-Key
-          - X-Amz-Security-Token
+          - '*'
         AllowMethods:
           - '*'
 

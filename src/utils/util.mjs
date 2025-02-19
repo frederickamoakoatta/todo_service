@@ -1,4 +1,5 @@
 import {awsCloudWatch, awsParams} from "./aws-config.mjs";
+import { v4 as uuidv4 } from "uuid";
 
 const fetchParam = async (paramName) => {
     try {
@@ -32,4 +33,8 @@ const logEvent = async (message) => {
     }
 }
 
-export {fetchParam, logEvent}
+const generateId = () => {
+    return uuidv4();
+};
+
+export {fetchParam, logEvent, generateId}

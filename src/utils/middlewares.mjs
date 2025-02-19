@@ -26,13 +26,30 @@ const errorHandler = (req, res, next) => {
     next();
 };
 
-const authValidator = [
-    //TODO : Add validation for access key here as well
-    header('userId')
-        .exists().withMessage('user_id is required in headers')
-        .isString().withMessage('user_id must be a string')
-        .notEmpty().withMessage('user_id cannot be empty'),
-];
+// const authValidator = [
+//     //TODO : Add validation for access key here as well
+//     header('userId')
+//         .exists().withMessage('user_id is required in headers')
+//         .isString().withMessage('user_id must be a string')
+//         .notEmpty().withMessage('user_id cannot be empty'),
+// ];
+
+const authValidator = (req, res, next) => {
+    // Check for userid in headers (case-insensitive)
+    const userIdHeader = Object.keys(req.headers)
+      .find(key => key.toLowerCase() === 'userid');
+    
+    if (!userIdHeader || !req.headers[userIdHeader]) {
+      return res.status(400).json({
+        statusCode: 400,
+        message: 'userId is required in headers'
+      });
+    }
+    
+    // Store the userId in a standardized location
+    req.userId = req.headers[userIdHeader];
+    next();
+  };
 
 const taskValidator = body('tasks')
         .exists().withMessage('tasks is required in request')
