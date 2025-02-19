@@ -1,13 +1,4 @@
-import AWS from 'aws-sdk';
-
-AWS.config.update({
-    region: 'us-west-1',
-    credentials: new AWS.SharedIniFileCredentials({ profile: "default" })
-});
-
-
-const awsParams =  new AWS.SSM();
-const awsDB = new AWS.DynamoDB.DocumentClient();
+import {awsDB, awsParams} from "../utils/aws-config.mjs";
 
 const fetchParam = async (paramName) => {
     try{
