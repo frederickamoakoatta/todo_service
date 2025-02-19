@@ -1,16 +1,5 @@
 import {awsDB, awsParams} from "../utils/aws-config.mjs";
 
-const fetchParam = async (paramName) => {
-    try{
-        const param  = await awsParams.getParameter({Name: paramName, WithDecryption: false }).promise();
-        return param.Parameter.Value;
-    }
-    catch (error) {
-        return error;
-    }
-
-}
-
 const fetchData = async (queryParams) => {
     try{
         const data = await awsDB.query(queryParams).promise();
@@ -52,4 +41,4 @@ const deleteData = async (queryParams) => {
     }
 };
 
-export {fetchParam, fetchData, insertData, updateData, deleteData};
+export {fetchData, insertData, updateData, deleteData};

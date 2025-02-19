@@ -17,6 +17,6 @@ if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
 
 const awsParams = new AWS.SSM();
 const awsDB = new AWS.DynamoDB.DocumentClient();
-const awsCloudWatch = new AWS.CloudWatch();
+const awsCloudWatch = new AWS.CloudWatchLogs();
 
 export { awsParams, awsCloudWatch, awsDB }

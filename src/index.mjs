@@ -1,8 +1,12 @@
 import express from 'express';
+import {authValidator, logger, verifyToken} from "./utils/middlewares.mjs";
 import serverless from 'serverless-http';
 import { fetchParam } from "./db/core.mjs";
-import { authValidator } from "./utils/middlewares.mjs";
 import todoRouter from "./routes/todo.mjs";
+import cors from "cors";
+import {fetchParam} from "./utils/util.mjs";
+import serverless from 'serverless-http';
+
 
 // Create Express app
 const app = express();
@@ -33,9 +37,18 @@ app.use((req, res, next) => {
 });
 
 // Apply auth middleware (spread it because it's an array)
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    })
+);
+app.use(verifyToken)
 app.use(authValidator);
 
 // Mount the router for todos
+app.use(logger)
 app.use('/api/v1', todoRouter);
 
 // Health check route
@@ -80,6 +93,6 @@ if (process.env.AWS_EXECUTION_ENV === undefined) {
       console.error('Failed to start server:', error);
     }
   };
-  
+
   startServer().catch(err => console.error('Server startup error:', err));
 }
