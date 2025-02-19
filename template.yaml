@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Todo Service API with Express.js
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+    Description: Deployment environment
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: nodejs20.x
+    Environment:
+      Variables:
+        NODE_ENV: !Ref Stage
+        STAGE: !Ref Stage
+        PORT: 8080
+
+Resources:
+  TodoServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: src/index.handler
+      Architectures:
+        - x86_64
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'ssm:GetParameter'
+                - 'ssm:GetParameters'
+              Resource:
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/todo-service/${Stage}/*'
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref TodoServiceApi
+            Path: "/{proxy+}"
+            Method: ANY
+
+  TodoServiceApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref Stage
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+          - X-Amz-Date
+          - X-Api-Key
+          - X-Amz-Security-Token
+        AllowMethods:
+          - '*'
+
+Outputs:
+  TodoServiceFunction:
+    Description: "Todo Service Lambda Function ARN"
+    Value: !GetAtt TodoServiceFunction.Arn
+  TodoServiceApi:
+    Description: "API Gateway ID"
+    Value: !Ref TodoServiceApi
+  TodoServiceEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${TodoServiceApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/"

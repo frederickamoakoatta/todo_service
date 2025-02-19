@@ -5,7 +5,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon ./src/index.mjs",
-    "start": "node ./src/index.mjs"
+    "start": "node ./src/index.mjs",
+    "build": "sam build",
+    "deploy": "sam deploy",
+    "deploy:guided": "sam deploy --guided",
+    "validate": "sam validate",
+    "local": "sam local start-api"
   },
   "keywords": [],
   "author": "Frederick Amoako-Atta",
@@ -18,7 +23,11 @@
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
-    "nodemod": "^3.0.6"
+    "nodemod": "^3.0.6",
+    "serverless-http": "^3.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
   },
   "type": "module"
 }
