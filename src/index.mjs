@@ -1,10 +1,7 @@
 import express from 'express';
 import {authValidator, logger, verifyToken} from "./utils/middlewares.mjs";
-import serverless from 'serverless-http';
-import { fetchParam } from "./db/core.mjs";
 import todoRouter from "./routes/todo.mjs";
 import cors from "cors";
-import {fetchParam} from "./utils/util.mjs";
 import serverless from 'serverless-http';
 
 
