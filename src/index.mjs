@@ -41,6 +41,13 @@ app.use(
         credentials: true,
     })
 );
+app.use(
+    cors({
+      origin: "https://todo-portal.vercel.app",
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      credentials: true,
+    })
+);
 app.use(verifyToken)
 app.use(authValidator);
 
