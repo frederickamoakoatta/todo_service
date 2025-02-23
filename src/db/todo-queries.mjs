@@ -1,16 +1,9 @@
 import {deleteData, fetchData, insertData, updateData} from "./core.mjs";
-import {getMockTodo, getMockTodos} from "../utils/mocks.mjs";
 import {generateId} from "../utils/util.mjs";
 
 const todoTable = 'todo-items';
-const isLocalEnvironment = process.env.IS_LOCAL === 'true' || process.env.SAM_LOCAL;
 
 const getTodos = async (userId) => {
-    if (isLocalEnvironment) {
-        console.log('[DEBUG] Using mock data for local environment');
-        return getMockTodos(userId);
-    }
-    
     const params = {
         TableName: todoTable,
         IndexName: 'user_id-index',
@@ -23,10 +16,6 @@ const getTodos = async (userId) => {
 }
 
 const getTodo = async (userId, taskId) => {
-    if (isLocalEnvironment) {
-        return getMockTodo(userId, taskId);
-    }
-    
     const params = {
         TableName: todoTable,
         KeyConditionExpression: "task_id = :task_id AND user_id = :user_id",
@@ -38,13 +27,8 @@ const getTodo = async (userId, taskId) => {
     return fetchData(params);
 }
 
-// Add similar mock data handling for other functions
+
 const insertTodo = async (task) => {
-    if (isLocalEnvironment) {
-        console.log('[DEBUG] Mock insert:', task);
-        return { success: true };
-    }
-    
     const params = {
         TableName: todoTable,
         Item: {

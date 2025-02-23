@@ -1,4 +1,4 @@
-import {awsDB, awsParams} from "../utils/aws-config.mjs";
+import {awsDB} from "../utils/aws-config.mjs";
 
 const fetchData = async (queryParams) => {
     try{

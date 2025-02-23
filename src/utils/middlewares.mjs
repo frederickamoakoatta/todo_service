@@ -2,6 +2,7 @@ import {header, body, param, validationResult} from "express-validator";
 import jwt from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
 import {logEvent} from "./util.mjs";
+import cors from "cors";
 
 const REGION = 'us-west-1';
 const USER_POOL_ID = 'us-west-1_ZEPalthpD';
@@ -26,30 +27,29 @@ const errorHandler = (req, res, next) => {
     next();
 };
 
-// const authValidator = [
-//     //TODO : Add validation for access key here as well
-//     header('userId')
-//         .exists().withMessage('user_id is required in headers')
-//         .isString().withMessage('user_id must be a string')
-//         .notEmpty().withMessage('user_id cannot be empty'),
-// ];
+const authValidator = [
+    header('userId')
+        .exists().withMessage('user_id is required in headers')
+        .isString().withMessage('user_id must be a string')
+        .notEmpty().withMessage('user_id cannot be empty'),
+];
 
-const authValidator = (req, res, next) => {
-    // Check for userid in headers (case-insensitive)
-    const userIdHeader = Object.keys(req.headers)
-      .find(key => key.toLowerCase() === 'userid');
-    
-    if (!userIdHeader || !req.headers[userIdHeader]) {
-      return res.status(400).json({
-        statusCode: 400,
-        message: 'userId is required in headers'
-      });
-    }
-    
-    // Store the userId in a standardized location
-    req.userId = req.headers[userIdHeader];
-    next();
-  };
+// const authValidator = (req, res, next) => {
+//     // Check for userid in headers (case-insensitive)
+//     const userIdHeader = Object.keys(req.headers)
+//       .find(key => key.toLowerCase() === 'userid');
+//
+//     if (!userIdHeader || !req.headers[userIdHeader]) {
+//       return res.status(400).json({
+//         statusCode: 400,
+//         message: 'userId is required in headers'
+//       });
+//     }
+//
+//     // Store the userId in a standardized location
+//     req.userId = req.headers[userIdHeader];
+//     next();
+//   };
 
 const taskValidator = body('tasks')
         .exists().withMessage('tasks is required in request')
@@ -95,4 +95,30 @@ const verifyToken = (req, res, next) => {
 };
 
 
-export {errorHandler, authValidator, taskValidator, statusValidator, idValidator, verifyToken, logger};
+const apiGatewayHandler = (req, res, next) => {
+    const path = req.path;
+    const segments = path.split('/').filter(segment => segment);
+
+    if (segments[0] && ['dev', 'test', 'prod'].includes(segments[0])) {
+        req.url = '/' + segments.slice(1).join('/');
+        console.log(`[DEBUG] Normalized path from ${path} to ${req.url}`);
+    }
+    next();
+}
+
+const allowedOrigins = ["http://localhost:5173", "https://todo-portal.vercel.app"];
+
+const corsHandler =
+    cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    });
+
+export {errorHandler, authValidator, taskValidator, statusValidator, idValidator, verifyToken, logger, apiGatewayHandler, corsHandler};
