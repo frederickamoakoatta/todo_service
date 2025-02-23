@@ -3,7 +3,7 @@
 ## Overview
 The Todo Service is a RESTful API built with Express.js, AWS OAuth, AWS Amplify, AWS Parameter Store, and DynamoDB. It provides basic authentication and CRUD operations for managing todos. This service is designed for frontend developers who want to study and implement authentication and CRUD operations using an external REST API.
 
-Additionally, the service powers an admin frontend where users can obtain API keys to access the endpoints.
+Obtain API keys to access the endpoints [here](https://todo-portal.vercel.app/).
 
 ## Features
 - User authentication via AWS Cognito

@@ -1,88 +1,21 @@
 import express from 'express';
-import {authValidator, logger, verifyToken} from "./utils/middlewares.mjs";
+import {apiGatewayHandler, authValidator, corsHandler, logger, verifyToken} from "./utils/middlewares.mjs";
 import todoRouter from "./routes/todo.mjs";
-import cors from "cors";
 import serverless from 'serverless-http';
 
 
 // Create Express app
 const app = express();
 
-// Add request logging for debugging
-app.use((req, res, next) => {
-  console.log(`[DEBUG] Request: ${req.method} ${req.originalUrl}`);
-  console.log(`[DEBUG] Path: ${req.path}`);
-  console.log(`[DEBUG] Headers:`, JSON.stringify(req.headers));
-  next();
-});
 
 app.use(express.json());
-
-// Use a path normalizer middleware to handle stage prefixes from API Gateway
-app.use((req, res, next) => {
-  // Handle API Gateway stage prefixes (like /dev) by normalizing the path
-  const path = req.path;
-  const segments = path.split('/').filter(segment => segment);
-  
-  // If the first segment might be a stage name (dev, prod, etc.)
-  if (segments[0] && ['dev', 'test', 'prod'].includes(segments[0])) {
-    // Reconstruct URL without the stage name for routing purposes
-    req.url = '/' + segments.slice(1).join('/');
-    console.log(`[DEBUG] Normalized path from ${path} to ${req.url}`);
-  }
-  next();
-});
-
-// Apply auth middleware (spread it because it's an array)
-app.use(
-    cors({
-        origin: "http://localhost:5173",
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        credentials: true,
-    })
-);
-app.use(
-    cors({
-      origin: "https://todo-portal.vercel.app",
-      methods: ["GET", "POST", "PUT", "DELETE"],
-      credentials: true,
-    })
-);
+app.use('/api/v1', todoRouter);
+app.use(apiGatewayHandler);
+app.use(corsHandler);
 app.use(verifyToken)
 app.use(authValidator);
-
-// Mount the router for todos
 app.use(logger)
-app.use('/api/v1', todoRouter);
 
-// Health check route
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'API is running' });
-});
-
-// Test route
-app.get('/api/v1/test', (req, res) => {
-  res.status(200).json({ message: 'Test route works!' });
-});
-
-// Default route for 404s
-app.use((req, res) => {
-  console.log(`[DEBUG] Route not found: ${req.method} ${req.path}`);
-  res.status(404).json({ 
-    statusCode: 404, 
-    message: `Route not found: ${req.method} ${req.path}` 
-  });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('[ERROR]', err);
-  res.status(500).json({
-    statusCode: 500,
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
 
 // Export the serverless handler for Lambda
 export const handler = serverless(app);
