@@ -9,18 +9,24 @@ const app = express();
 
 
 app.use(express.json());
-app.use('/api/v1', todoRouter);
-app.use(apiGatewayHandler);
+// app.use(apiGatewayHandler);
 app.use(corsHandler);
 app.use(verifyToken)
 app.use(authValidator);
 app.use(logger)
 
+app.get("/prod/api/v1/health-check", (req, res) => {
+  res.status(200).send('Working');
+});
+
+
+app.use('/prod/api/v1', todoRouter);
+
+
 
 // Export the serverless handler for Lambda
 export const handler = serverless(app);
 
-// Only start the server when running locally (not in Lambda)
 if (process.env.AWS_EXECUTION_ENV === undefined) {
   const startServer = async () => {
     try {
