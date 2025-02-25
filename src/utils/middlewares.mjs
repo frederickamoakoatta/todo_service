@@ -104,4 +104,4 @@ const corsHandler =
         credentials: true,
     });
 
-export {errorHandler, authValidator, taskValidator, statusValidator, idValidator, verifyToken, logger, apiGatewayHandler, corsHandler};
+export {errorHandler, authValidator, taskValidator, statusValidator, verifyToken, logger, apiGatewayHandler, corsHandler, idValidator};
