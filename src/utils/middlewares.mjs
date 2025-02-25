@@ -34,23 +34,6 @@ const authValidator = [
         .notEmpty().withMessage('user_id cannot be empty'),
 ];
 
-// const authValidator = (req, res, next) => {
-//     // Check for userid in headers (case-insensitive)
-//     const userIdHeader = Object.keys(req.headers)
-//       .find(key => key.toLowerCase() === 'userid');
-//
-//     if (!userIdHeader || !req.headers[userIdHeader]) {
-//       return res.status(400).json({
-//         statusCode: 400,
-//         message: 'userId is required in headers'
-//       });
-//     }
-//
-//     // Store the userId in a standardized location
-//     req.userId = req.headers[userIdHeader];
-//     next();
-//   };
-
 const taskValidator = body('tasks')
         .exists().withMessage('tasks is required in request')
         .isString().withMessage('tasks must be a string')
@@ -59,7 +42,7 @@ const taskValidator = body('tasks')
 const statusValidator = body('completed')
         .exists().withMessage('completed is required in request')
         .isBoolean().withMessage('completed must be a boolean value')
-        .notEmpty().withMessage('completed cannot be empty')
+        .notEmpty().withMessage('completed cannot be empty');
 
 
 const idValidator = param('id')
